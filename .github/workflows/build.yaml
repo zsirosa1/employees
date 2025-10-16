@@ -127,8 +127,8 @@ jobs:
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
       - name: Update deployment manifest
         run: |
-          yq e '.image.tag = "${VERSION}"' -i value.yaml
-          cat value.yaml
+          yq e '.image.tag = "${VERSION}"' -i values.yaml
+          cat values.yaml
       - name: Commit and push changes
         run: |
           git config --global user.name "github-actions"
