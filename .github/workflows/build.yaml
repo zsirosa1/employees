@@ -112,3 +112,24 @@ jobs:
     needs: build-image
     steps:
       - run: echo "Deploy application"
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          repository: zsirosa1/employees-cd-training-config
+          token: ${{ secrets.CONFIG_REPO_GITHUB_TOKEN }}
+      - name: Read version from build job
+        run: |
+          VERSION=${{ needs.build.outputs.version }}
+          echo "VERSION: ${VERSION}"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+      - name: Update deployment manifest
+        run: |
+          yq e '.image.tag = "${VERSION}"' -i value.yaml
+          cat value.yaml
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git commit -am "Update image tag to ${VERSION}"
+          git push
